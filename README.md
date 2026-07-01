@@ -1,5 +1,5 @@
 # Kaliurang Lava Tour
 
-Website untuk jasa jeep lava tour merapi di kaliurang. Dibuat biar pelanggan bisa lihat paket tour dan langsung hubungi lewat WhatsApp.
+Website untuk jasa jeep lava tour merapi di kaliurang. Dibuat untuk pelanggan agar bisa melihat paket tour dan langsung menghubungi lewat WhatsApp.
 
 🌐 https://kaliurang-lava-tour.vercel.app/
