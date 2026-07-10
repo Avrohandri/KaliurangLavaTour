@@ -179,6 +179,90 @@
         .feature-box:hover {
             transform: translateY(-4px);
         }
+
+        /* ── Scroll Reveal ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+        }
+        .reveal.from-left  { transform: translateX(-50px); }
+        .reveal.from-right { transform: translateX(50px); }
+        .reveal.visible {
+            opacity: 1;
+            transform: translate(0,0);
+        }
+
+        /* stagger children */
+        .stagger-children > * {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s cubic-bezier(.22,1,.36,1), transform 0.6s cubic-bezier(.22,1,.36,1);
+        }
+        .stagger-children.visible > *:nth-child(1) { transition-delay: 0.05s; opacity:1; transform:translateY(0); }
+        .stagger-children.visible > *:nth-child(2) { transition-delay: 0.15s; opacity:1; transform:translateY(0); }
+        .stagger-children.visible > *:nth-child(3) { transition-delay: 0.25s; opacity:1; transform:translateY(0); }
+        .stagger-children.visible > *:nth-child(4) { transition-delay: 0.35s; opacity:1; transform:translateY(0); }
+        .stagger-children.visible > *:nth-child(5) { transition-delay: 0.45s; opacity:1; transform:translateY(0); }
+        .stagger-children.visible > *:nth-child(6) { transition-delay: 0.55s; opacity:1; transform:translateY(0); }
+
+        /* ── Hero entrance ── */
+        @keyframes heroFadeUp {
+            from { opacity:0; transform:translateY(30px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .hero-animate { animation: heroFadeUp 0.9s cubic-bezier(.22,1,.36,1) both; }
+        .hero-delay-1 { animation-delay: 0.1s; }
+        .hero-delay-2 { animation-delay: 0.3s; }
+        .hero-delay-3 { animation-delay: 0.5s; }
+        .hero-delay-4 { animation-delay: 0.7s; }
+        .hero-delay-5 { animation-delay: 0.9s; }
+
+        /* ── Float ── */
+        @keyframes floatY {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-12px); }
+        }
+        .float-anim { animation: floatY 4s ease-in-out infinite; }
+
+        /* ── Parallax hero bg ── */
+        .hero-bg { background-attachment: fixed; }
+        @media (max-width: 768px) { .hero-bg { background-attachment: scroll; } }
+
+        /* ── Navbar scroll ── */
+        header.scrolled {
+            background-color: rgba(6, 27, 14, 0.92) !important;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+
+        /* ── Counter number ── */
+        .counter-num { display:inline-block; }
+
+        /* ── Pulse badge ── */
+        @keyframes pulse-badge {
+            0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+            50%      { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+        }
+        .pulse-badge { animation: pulse-badge 2s ease-in-out infinite; }
+
+        /* ── Gallery shimmer on load ── */
+        @keyframes shimmerIn {
+            from { opacity:0; transform:scale(0.95); }
+            to   { opacity:1; transform:scale(1); }
+        }
+        .gallery-item { animation: shimmerIn 0.8s cubic-bezier(.22,1,.36,1) both; }
+        .gallery-item:nth-child(1) { animation-delay: 0.1s; }
+        .gallery-item:nth-child(2) { animation-delay: 0.25s; }
+        .gallery-item:nth-child(3) { animation-delay: 0.4s; }
+        .gallery-item:nth-child(4) { animation-delay: 0.55s; }
+
+        /* ── Smooth scroll indicator ── */
+        @keyframes bounceDown {
+            0%,100% { transform:translateY(0); opacity:0.7; }
+            50%      { transform:translateY(8px); opacity:1; }
+        }
+        .scroll-hint { animation: bounceDown 1.8s ease-in-out infinite; }
     </style>
 </head>
 
@@ -221,8 +305,8 @@
         <!-- Main Hero Content -->
         <div class="flex-grow flex flex-col items-center justify-center text-center px-4 mb-24 z-10">
             <!-- Mountain Icon Graphic -->
-            <div class="mb-6 opacity-90 text-adventureGold">
-                <svg class="w-24 h-24 mx-auto" fill="currentColor" viewbox="0 0 100 100">
+            <div class="mb-6 opacity-90 text-adventureGold hero-animate hero-delay-1">
+                <svg class="w-24 h-24 mx-auto float-anim" fill="currentColor" viewbox="0 0 100 100">
                     <path d="M50 20L15 80H85L50 20ZM50 35L72 73H28L50 35Z"></path>
                     <path d="M50 10C52 10 54 12 54 14C54 16 52 18 50 18C48 18 46 16 46 14C46 12 48 10 50 10Z"></path>
                     <rect height="6" width="4" x="48" y="0"></rect>
@@ -232,19 +316,19 @@
             </div>
 
             <!-- Main Headline -->
-            <h2 class="text-3xl md:text-5xl font-medium italic mb-2 tracking-wide"
+            <h2 class="text-3xl md:text-5xl font-medium italic mb-2 tracking-wide hero-animate hero-delay-2"
                 style="font-family: 'Times New Roman', serif;">Temukan</h2>
-            <h1 class="text-5xl md:text-7xl font-black uppercase mb-6 tracking-tighter">
+            <h1 class="text-5xl md:text-7xl font-black uppercase mb-6 tracking-tighter hero-animate hero-delay-3">
                 Petualangan Merapi
             </h1>
 
             <!-- Sub Headline -->
-            <p class="text-lg md:text-xl font-medium opacity-90 mb-10 max-w-2xl mx-auto">
+            <p class="text-lg md:text-xl font-medium opacity-90 mb-10 max-w-2xl mx-auto hero-animate hero-delay-4">
                 Jelajahi keindahan alam liar lereng vulkanik bersama spesialis off-road terpercaya di Kaliurang.
             </p>
 
             <!-- CTA Button -->
-            <div class="flex flex-wrap justify-center gap-4">
+            <div class="flex flex-wrap justify-center gap-4 hero-animate hero-delay-5">
                 <a class="bg-white text-gray-900 px-8 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-adventureGold hover:text-white transition-all duration-300 shadow-xl"
                     href="#tours">
                     Lihat Petualangan
@@ -253,6 +337,11 @@
                     href="#">
                     <span class="material-symbols-outlined">chat</span> Hubungi Kami
                 </a>
+            </div>
+
+            <!-- Scroll Hint -->
+            <div class="absolute bottom-24 left-1/2 -translate-x-1/2 scroll-hint opacity-70 z-20">
+                <span class="material-symbols-outlined text-white text-3xl">keyboard_arrow_down</span>
             </div>
         </div>
 
@@ -264,8 +353,8 @@
     <!-- About Us Section -->
     <section class="py-xl" id="about">
         <div class="max-w-7xl mx-auto px-margin mt-10">
-            <div class="grid md:grid-cols-2 gap-lg items-center">
-                <div class="space-y-md">
+            <div class="grid md:grid-cols-2 gap-lg items-center reveal">
+                <div class="space-y-md reveal from-left">
                     <span
                         class="bg-adventureGold/20 text-adventureGold font-bold px-4 py-2 rounded-full uppercase text-sm">Pelopor
                         Terpercaya</span>
@@ -273,18 +362,18 @@
                     <p class="font-body-lg text-body-lg text-on-surface-variant">Kami tumbuh besar di lereng Merapi — bukan hanya mengenal jalannya, tapi juga cerita di balik setiap bebatuan dan aliran laharnya. Setiap perjalanan kami rancang bukan sekadar untuk seru-seruan, tapi agar Anda pulang membawa kenangan yang benar-benar terasa. Pengemudi kami adalah warga lokal yang sudah bertahun-tahun menjelajahi medan ini, dan mereka akan dengan senang hati berbagi kisah Merapi yang tidak akan Anda temukan di buku mana pun.</p>
                     <div class="grid grid-cols-2 gap-md pt-md">
                         <div class="border-l-4 border-adventureGold pl-md">
-                            <div class="font-headline-md text-headline-md text-primary">100+</div>
+                            <div class="font-headline-md text-headline-md text-primary counter-num" data-target="100" data-suffix="+">0</div>
                             <div class="font-bold text-sm text-on-surface-variant uppercase mt-1">Cek Keamanan Harian
                             </div>
                         </div>
                         <div class="border-l-4 border-adventureGold pl-md">
-                            <div class="font-headline-md text-headline-md text-primary">10+</div>
+                            <div class="font-headline-md text-headline-md text-primary counter-num" data-target="10" data-suffix="+">0</div>
                             <div class="font-bold text-sm text-on-surface-variant uppercase mt-1">Tahun Pengalaman</div>
                         </div>
                     </div>
                 </div>
                 <div
-                    class="relative aspect-square bg-surface-container-highest flex items-center justify-center rounded-3xl overflow-hidden shadow-2xl">
+                    class="relative aspect-square bg-surface-container-highest flex items-center justify-center rounded-3xl overflow-hidden shadow-2xl reveal from-right">
                     <img class="w-full h-full object-cover" src="assets/images/tour_bawahheader.jpeg" />
                 </div>
             </div>
@@ -299,7 +388,7 @@
         <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
 
         <div class="max-w-7xl mx-auto px-margin relative z-10">
-            <div class="grid md:grid-cols-3 gap-lg text-center">
+            <div class="grid md:grid-cols-3 gap-lg text-center stagger-children">
                 <div class="space-y-sm">
                     <div
                         class="text-adventureGold mb-md bg-white/10 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
@@ -334,7 +423,7 @@
     <!-- Tour Packages Section -->
     <section class="py-xl" id="tours">
         <div class="max-w-7xl mx-auto px-margin">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-lg gap-md">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-lg gap-md reveal">
                 <div>
                     <h2 class="font-headline-xl text-headline-xl text-primary">Paket Petualangan</h2>
                     <p class="font-body-lg text-body-lg text-on-surface-variant">Pilih tingkat intensitas Anda. Mulai
@@ -345,7 +434,7 @@
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 stagger-children">
                 <!-- Package 1 -->
                 <div class="casual-card flex flex-col group">
                     <div class="relative h-56 overflow-hidden">
@@ -392,7 +481,7 @@
                 <div class="casual-card flex flex-col group relative">
                     <!-- Badge Paling Diminati -->
                     <div
-                        class="absolute top-4 left-4 z-20 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase shadow-lg tracking-wider">
+                        class="absolute top-4 left-4 z-20 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase shadow-lg tracking-wider pulse-badge">
                         🔥 Paling Diminati</div>
                     <div class="relative h-56 overflow-hidden">
                         <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -482,9 +571,9 @@
     <!-- Lava Tour Action Gallery -->
     <section class="py-xl" id="gallery">
         <div class="max-w-7xl mx-auto px-margin">
-            <h2 class="font-headline-xl text-headline-xl text-primary text-center mb-lg">Aksi Lava Tour</h2>
+            <h2 class="font-headline-xl text-headline-xl text-primary text-center mb-lg reveal">Aksi Lava Tour</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 md:gap-6 h-[800px] md:h-[600px]">
-                <div class="md:col-span-2 md:row-span-2 relative overflow-hidden group rounded-3xl shadow-lg">
+                <div class="md:col-span-2 md:row-span-2 relative overflow-hidden group rounded-3xl shadow-lg gallery-item">
                     <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         src="assets/images/gallery_kalikuning.jpg" alt="Kali Kuning" />
                     <div
@@ -492,7 +581,7 @@
                         <p class="text-white font-bold text-xl uppercase tracking-wider">Kali Kuning</p>
                     </div>
                 </div>
-                <div class="md:col-span-2 relative overflow-hidden group rounded-3xl shadow-lg">
+                <div class="md:col-span-2 relative overflow-hidden group rounded-3xl shadow-lg gallery-item">
                     <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         src="assets/images/gallery_bunker.jpg" alt="Bunker Kaliadem" />
                     <div
@@ -500,7 +589,7 @@
                         <p class="text-white font-bold text-lg uppercase tracking-wider">Bunker Kaliadem</p>
                     </div>
                 </div>
-                <div class="relative overflow-hidden group rounded-3xl shadow-lg">
+                <div class="relative overflow-hidden group rounded-3xl shadow-lg gallery-item">
                     <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         src="assets/images/gallery_nawangjagad.jpg" alt="Nawang Jagad" />
                     <div
@@ -508,7 +597,7 @@
                         <p class="text-white font-bold text-md uppercase tracking-wider">Nawang Jagad</p>
                     </div>
                 </div>
-                <div class="relative overflow-hidden group rounded-3xl shadow-lg">
+                <div class="relative overflow-hidden group rounded-3xl shadow-lg gallery-item">
                     <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         src="assets/images/gallery_batualien.jpg" alt="Batu Alien" />
                     <div
@@ -523,8 +612,8 @@
     <!-- Facilities -->
     <section class="py-xl bg-surface-container-high rounded-[3rem] mx-4 md:mx-10 my-10">
         <div class="max-w-7xl mx-auto px-margin">
-            <h2 class="font-headline-lg text-headline-lg text-primary mb-10 text-center">Fasilitas Premium</h2>
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <h2 class="font-headline-lg text-headline-lg text-primary mb-10 text-center reveal">Fasilitas Premium</h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 stagger-children">
                 <div class="feature-box flex flex-col items-center gap-3 p-6 bg-white shadow-sm text-center">
                     <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mb-2">
                         <span class="material-symbols-outlined !text-3xl"
@@ -572,7 +661,7 @@
 
     <!-- Location Section -->
     <section class="py-xl" id="location">
-        <div class="max-w-7xl mx-auto px-margin">
+        <div class="max-w-7xl mx-auto px-margin reveal">
             <div
                 class="grid md:grid-cols-2 gap-10 items-center bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
                 <div
@@ -678,6 +767,72 @@
             <span class="material-symbols-outlined !text-3xl" data-icon="chat">chat</span>
         </a>
     </div>
+
+    <script>
+    // ── Navbar scroll solid ──
+    const header = document.querySelector('header');
+    window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // ── IntersectionObserver for reveal & stagger ──
+    const revealEls = document.querySelectorAll('.reveal, .stagger-children');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => observer.observe(el));
+
+    // ── Gallery reveal ──
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const galleryObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                galleryObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    galleryItems.forEach(el => {
+        el.style.animationPlayState = 'paused';
+        galleryObserver.observe(el);
+    });
+
+    // ── Counter animation ──
+    const counters = document.querySelectorAll('.counter-num[data-target]');
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const target = +el.dataset.target;
+            const suffix = el.dataset.suffix || '';
+            const duration = 1500;
+            const step = Math.ceil(target / (duration / 16));
+            let current = 0;
+            const tick = () => {
+                current = Math.min(current + step, target);
+                el.textContent = current + suffix;
+                if (current < target) requestAnimationFrame(tick);
+            };
+            tick();
+            counterObserver.unobserve(el);
+        });
+    }, { threshold: 0.5 });
+    counters.forEach(el => counterObserver.observe(el));
+
+    // ── Hide scroll hint on scroll ──
+    const scrollHint = document.querySelector('.scroll-hint');
+    if (scrollHint) {
+        window.addEventListener('scroll', () => {
+            scrollHint.style.opacity = window.scrollY > 50 ? '0' : '0.7';
+            scrollHint.style.transition = 'opacity 0.4s ease';
+        }, { passive: true });
+    }
+    </script>
 </body>
 
 </html>
