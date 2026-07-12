@@ -263,6 +263,46 @@
             50%      { transform:translateY(8px); opacity:1; }
         }
         .scroll-hint { animation: bounceDown 1.8s ease-in-out infinite; }
+
+        /* ── Nature Wind Canvas ── */
+        #wind-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* ── Wind sway on hero headline ── */
+        @keyframes windSway {
+            0%   { transform: translateX(0)   rotate(0deg); }
+            25%  { transform: translateX(3px)  rotate(0.3deg); }
+            50%  { transform: translateX(-2px) rotate(-0.2deg); }
+            75%  { transform: translateX(2px)  rotate(0.15deg); }
+            100% { transform: translateX(0)   rotate(0deg); }
+        }
+        .wind-sway {
+            animation: windSway 6s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* ── Wind streak lines ── */
+        @keyframes windStreak {
+            0%   { transform: translateX(-120%); opacity: 0; }
+            10%  { opacity: 0.18; }
+            80%  { opacity: 0.12; }
+            100% { transform: translateX(120vw);  opacity: 0; }
+        }
+        .wind-streak {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            border-radius: 9999px;
+            pointer-events: none;
+            animation: windStreak linear infinite;
+            z-index: 6;
+        }
     </style>
 </head>
 
@@ -317,9 +357,9 @@
 
             <!-- Main Headline -->
             <h2 class="text-3xl md:text-5xl font-medium italic mb-2 tracking-wide hero-animate hero-delay-2"
-                style="font-family: 'Times New Roman', serif;">Temukan</h2>
+                style="font-family: 'Times New Roman', serif;"><span class="wind-sway" style="animation-delay:0s;">Temukan</span></h2>
             <h1 class="text-5xl md:text-7xl font-black uppercase mb-6 tracking-tighter hero-animate hero-delay-3">
-                Petualangan Merapi
+                <span class="wind-sway" style="animation-delay:1.5s;">Petualangan Merapi</span>
             </h1>
 
             <!-- Sub Headline -->
@@ -344,6 +384,18 @@
                 <span class="material-symbols-outlined text-white text-3xl">keyboard_arrow_down</span>
             </div>
         </div>
+
+        <!-- Nature Wind Canvas -->
+        <canvas id="wind-canvas"></canvas>
+
+        <!-- Wind streak lines (pure CSS, staggered) -->
+        <div class="wind-streak" style="top:18%; width:180px; animation-duration:4.2s; animation-delay:0s;"></div>
+        <div class="wind-streak" style="top:32%; width:240px; animation-duration:5.8s; animation-delay:1.1s;"></div>
+        <div class="wind-streak" style="top:47%; width:120px; animation-duration:3.9s; animation-delay:2.3s;"></div>
+        <div class="wind-streak" style="top:61%; width:200px; animation-duration:6.5s; animation-delay:0.7s;"></div>
+        <div class="wind-streak" style="top:75%; width:160px; animation-duration:4.8s; animation-delay:3.5s;"></div>
+        <div class="wind-streak" style="top:24%; width:300px; animation-duration:7.1s; animation-delay:1.9s;"></div>
+        <div class="wind-streak" style="top:55%; width:90px;  animation-duration:3.3s; animation-delay:4.2s;"></div>
 
         <!-- The Jagged Mountain Divider -->
         <div class="mountain-divider"></div>
@@ -832,6 +884,112 @@
             scrollHint.style.transition = 'opacity 0.4s ease';
         }, { passive: true });
     }
+    // ── Wind Particle Canvas ──
+    (function () {
+        const canvas = document.getElementById('wind-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width  = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize, { passive: true });
+
+        // Particle types: ash dot, tiny leaf stroke, dust speck
+        const TYPES = ['ash', 'leaf', 'dust'];
+        const COUNT = 55;
+        const particles = [];
+
+        function rand(a, b) { return a + Math.random() * (b - a); }
+
+        function createParticle(forceLeft) {
+            const type = TYPES[Math.floor(Math.random() * TYPES.length)];
+            const size = type === 'leaf' ? rand(4, 9) : rand(1.5, 4);
+            return {
+                type,
+                x: forceLeft ? rand(-50, -5) : rand(-50, canvas.width + 50),
+                y: rand(0, canvas.height),
+                size,
+                speedX: rand(0.4, 1.8),           // wind direction: left→right
+                speedY: rand(-0.3, 0.5),           // slight drift
+                angle: rand(0, Math.PI * 2),
+                spin:  rand(-0.03, 0.03),
+                alpha: rand(0.15, 0.55),
+                wobbleAmp:  rand(0.2, 0.8),
+                wobbleFreq: rand(0.01, 0.03),
+                wobbleOffset: rand(0, Math.PI * 2),
+                t: 0,
+            };
+        }
+
+        for (let i = 0; i < COUNT; i++) particles.push(createParticle(false));
+
+        function drawAsh(p) {
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(220,210,200,0.9)';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawLeaf(p) {
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, p.size, p.size * 0.42, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(120,190,110,0.75)';
+            ctx.fill();
+            // vein
+            ctx.beginPath();
+            ctx.moveTo(-p.size, 0);
+            ctx.lineTo(p.size, 0);
+            ctx.strokeStyle = 'rgba(80,140,70,0.5)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawDust(p) {
+            ctx.save();
+            ctx.globalAlpha = p.alpha * 0.7;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,240,210,0.8)';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (const p of particles) {
+                p.t += 1;
+                p.x += p.speedX;
+                p.y += p.speedY + Math.sin(p.t * p.wobbleFreq + p.wobbleOffset) * p.wobbleAmp;
+                p.angle += p.spin;
+
+                // Gust effect: occasional speed boost
+                if (p.t % 180 < 20) p.x += 0.6;
+
+                if (p.x > canvas.width + 60) {
+                    Object.assign(p, createParticle(true));
+                }
+
+                if (p.type === 'ash')  drawAsh(p);
+                else if (p.type === 'leaf') drawLeaf(p);
+                else drawDust(p);
+            }
+
+            requestAnimationFrame(loop);
+        }
+        loop();
+    })();
     </script>
 </body>
 
