@@ -125,7 +125,9 @@
             background-position: center;
             min-height: 100vh;
             position: relative;
+            background-attachment: fixed;
         }
+        @media (max-width: 768px) { .hero-bg { background-attachment: scroll; } }
 
         /* The distinctive white jagged/mountain cutout at the bottom */
         .mountain-divider {
@@ -225,9 +227,7 @@
         }
         .float-anim { animation: floatY 4s ease-in-out infinite; }
 
-        /* ── Parallax hero bg ── */
-        .hero-bg { background-attachment: fixed; }
-        @media (max-width: 768px) { .hero-bg { background-attachment: scroll; } }
+        /* Parallax attachment handled in main hero-bg rule */
 
         /* ── Navbar scroll ── */
         header.scrolled {
@@ -262,7 +262,10 @@
             0%,100% { transform:translateY(0); opacity:0.7; }
             50%      { transform:translateY(8px); opacity:1; }
         }
-        .scroll-hint { animation: bounceDown 1.8s ease-in-out infinite; }
+        .scroll-hint {
+            animation: bounceDown 1.8s ease-in-out infinite;
+            transition: opacity 0.4s ease;
+        }
 
         /* ── Nature Wind Canvas ── */
         #wind-canvas {
@@ -821,10 +824,15 @@
     </div>
 
     <script>
-    // ── Navbar scroll solid ──
+    // ── Navbar scroll solid (State cached to reduce layout thrashing) ──
     const header = document.querySelector('header');
+    let isHeaderScrolled = false;
     window.addEventListener('scroll', () => {
-        header.classList.toggle('scrolled', window.scrollY > 60);
+        const scrolled = window.scrollY > 60;
+        if (scrolled !== isHeaderScrolled) {
+            isHeaderScrolled = scrolled;
+            header.classList.toggle('scrolled', isHeaderScrolled);
+        }
     }, { passive: true });
 
     // ── IntersectionObserver for reveal & stagger ──
@@ -876,15 +884,23 @@
     }, { threshold: 0.5 });
     counters.forEach(el => counterObserver.observe(el));
 
-    // ── Hide scroll hint on scroll ──
+    // ── Hide scroll hint on scroll (State cached to reduce layout thrashing) ──
     const scrollHint = document.querySelector('.scroll-hint');
     if (scrollHint) {
+        let hintVisible = true;
         window.addEventListener('scroll', () => {
-            scrollHint.style.opacity = window.scrollY > 50 ? '0' : '0.7';
-            scrollHint.style.transition = 'opacity 0.4s ease';
+            const exceed = window.scrollY > 50;
+            if (exceed && hintVisible) {
+                hintVisible = false;
+                scrollHint.style.opacity = '0';
+            } else if (!exceed && !hintVisible) {
+                hintVisible = true;
+                scrollHint.style.opacity = '0.7';
+            }
         }, { passive: true });
     }
-    // ── Wind Particle Canvas ──
+
+    // ── Wind Particle Canvas (GC Optimized, pre-calculated render pointers) ──
     (function () {
         const canvas = document.getElementById('wind-canvas');
         if (!canvas) return;
@@ -897,34 +913,11 @@
         resize();
         window.addEventListener('resize', resize, { passive: true });
 
-        // Particle types: ash dot, tiny leaf stroke, dust speck
         const TYPES = ['ash', 'leaf', 'dust'];
         const COUNT = 55;
         const particles = [];
 
         function rand(a, b) { return a + Math.random() * (b - a); }
-
-        function createParticle(forceLeft) {
-            const type = TYPES[Math.floor(Math.random() * TYPES.length)];
-            const size = type === 'leaf' ? rand(4, 9) : rand(1.5, 4);
-            return {
-                type,
-                x: forceLeft ? rand(-50, -5) : rand(-50, canvas.width + 50),
-                y: rand(0, canvas.height),
-                size,
-                speedX: rand(0.4, 1.8),           // wind direction: left→right
-                speedY: rand(-0.3, 0.5),           // slight drift
-                angle: rand(0, Math.PI * 2),
-                spin:  rand(-0.03, 0.03),
-                alpha: rand(0.15, 0.55),
-                wobbleAmp:  rand(0.2, 0.8),
-                wobbleFreq: rand(0.01, 0.03),
-                wobbleOffset: rand(0, Math.PI * 2),
-                t: 0,
-            };
-        }
-
-        for (let i = 0; i < COUNT; i++) particles.push(createParticle(false));
 
         function drawAsh(p) {
             ctx.save();
@@ -945,7 +938,6 @@
             ctx.ellipse(0, 0, p.size, p.size * 0.42, 0, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(120,190,110,0.75)';
             ctx.fill();
-            // vein
             ctx.beginPath();
             ctx.moveTo(-p.size, 0);
             ctx.lineTo(p.size, 0);
@@ -965,25 +957,47 @@
             ctx.restore();
         }
 
+        function resetParticle(p, forceLeft) {
+            const type = TYPES[Math.floor(Math.random() * TYPES.length)];
+            p.type = type;
+            p.x = forceLeft ? rand(-50, -5) : rand(-50, canvas.width + 50);
+            p.y = rand(0, canvas.height);
+            p.size = type === 'leaf' ? rand(4, 9) : rand(1.5, 4);
+            p.speedX = rand(0.4, 1.8);
+            p.speedY = rand(-0.3, 0.5);
+            p.angle = rand(0, Math.PI * 2);
+            p.spin = rand(-0.03, 0.03);
+            p.alpha = rand(0.15, 0.55);
+            p.wobbleAmp = rand(0.2, 0.8);
+            p.wobbleFreq = rand(0.01, 0.03);
+            p.wobbleOffset = rand(0, Math.PI * 2);
+            p.t = 0;
+            p.draw = type === 'ash' ? drawAsh : (type === 'leaf' ? drawLeaf : drawDust);
+        }
+
+        for (let i = 0; i < COUNT; i++) {
+            const p = {};
+            resetParticle(p, false);
+            particles.push(p);
+        }
+
         function loop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            for (const p of particles) {
+            for (let i = 0; i < COUNT; i++) {
+                const p = particles[i];
                 p.t += 1;
                 p.x += p.speedX;
                 p.y += p.speedY + Math.sin(p.t * p.wobbleFreq + p.wobbleOffset) * p.wobbleAmp;
                 p.angle += p.spin;
 
-                // Gust effect: occasional speed boost
                 if (p.t % 180 < 20) p.x += 0.6;
 
                 if (p.x > canvas.width + 60) {
-                    Object.assign(p, createParticle(true));
+                    resetParticle(p, true);
                 }
 
-                if (p.type === 'ash')  drawAsh(p);
-                else if (p.type === 'leaf') drawLeaf(p);
-                else drawDust(p);
+                p.draw(p);
             }
 
             requestAnimationFrame(loop);
